@@ -33,7 +33,7 @@ services:
       - dsa-network
 
   analyzer:
-    image: docker.io/yourdockerhubusername/daily-stock-analysis:main
+    image: docker.io/ishowlight/daily-stock-analysis:main
     # build:
     #   context: ..
     #   dockerfile: docker/Dockerfile
