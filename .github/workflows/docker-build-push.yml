@@ -2,7 +2,9 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [main]
+    branches: 
+      - main
+      - feature/light    # ← 加上这一行
     paths:
       - 'src/**'
       - 'api/**'
