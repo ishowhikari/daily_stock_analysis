@@ -2,7 +2,7 @@ name: daily-stock-analysis
 
 services:
   server:
-    # CI build 后推送到 Docker Hub，本地直接使用镜像
+    # 镜像模式：CI build 后推送到 Docker Hub，本地直接拉取
     image: docker.io/ishowlight/daily-stock-analysis:latest
     # 本地开发时取消下面注释，用本地 build
     # build:
@@ -10,6 +10,7 @@ services:
     #   dockerfile: docker/Dockerfile
     container_name: dsa-server
     restart: unless-stopped
+    command: ["python", "main.py", "--serve-only", "--host", "0.0.0.0", "--port", "${API_PORT:-8000}"]
     env_file:
       - ../.env
     ports:
@@ -23,6 +24,9 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - WEBUI_HOST=0.0.0.0
+      - HTTP_PROXY=${HTTP_PROXY:-}
+      - HTTPS_PROXY=${HTTPS_PROXY:-}
+      - NO_PROXY=localhost,127.0.0.1
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${API_PORT:-8000}/api/v1/health"]
       interval: 30s
@@ -49,6 +53,7 @@ services:
       - ../strategies:/app/strategies:ro
     environment:
       - TZ=Asia/Shanghai
+      - WEBUI_HOST=0.0.0.0
     command: ["python", "main.py", "--schedule", "--time", "18:00"]
     networks:
       - dsa-network
@@ -63,7 +68,7 @@ services:
       - WATCHTOWER_POLL_INTERVAL=3600
       - WATCHTOWER_CLEANUP=true
       - WATCHTOWER_INCLUDE_RESTARTING=true
-    command: --interval 3600 --scope dsa server analyzer
+    command: --interval 3600 server analyzer
     networks:
       - dsa-network
 
